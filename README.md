@@ -4,13 +4,15 @@ Research prototype for exploring public computer centers, Connected Communities 
 
 ## Open the map
 
+The published map is at <https://boryanata.github.io/equity-map-public/>.
+
 The repository root is a static website. To preview it locally:
 
 ```sh
 python3 -m http.server 8767 --bind 127.0.0.1
 ```
 
-Then open <http://127.0.0.1:8767/>. GitHub Pages must be enabled separately for an online map URL.
+Then open <http://127.0.0.1:8767/>.
 
 ## Data shown
 
