@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#102833">
+  <meta name="description" content="Research prototype mapping NYC public computer centers, Connected Communities locations, and Digital Investment Districts.">
+  <title>Digital Equity Map · Research prototype</title>
+  <link rel="stylesheet" href="./vendor/leaflet.css">
+  <link rel="stylesheet" href="./style.css?v=release-1">
+  <script src="./vendor/leaflet.js" defer></script>
+  <script src="./app.js?v=release-1" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="brandmark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <div class="brandtext"><div class="eyebrow">CUNY PIT LAB <span>×</span> NYC OTI</div><h1>Digital Equity Map</h1></div>
+    <div class="header-meta"><span class="dot"></span> Research prototype <span class="header-divider"></span> NYC · 2024 PCC data</div>
+  </header>
+  <main class="workspace">
+    <aside class="sidebar" aria-label="Map controls and center list">
+      <div class="sidebar-scroll">
+        <div class="intro"><div class="section-label">EXPLORE THE NETWORK</div><h2>Where does public access meet investment?</h2><p>Explore public computer centers, Connected Communities locations, and high-need neighborhoods together.</p></div>
+        <section class="borough-overview" aria-label="Compare center counts by borough">
+          <div class="borough-heading"><h3>Centers by borough</h3><button id="borough-reset" type="button" hidden>Show all</button></div>
+          <div id="borough-bars" class="borough-bars" aria-live="polite"></div>
+          <div class="chart-legend" aria-label="Borough chart legend"><div><span class="chart-key public-key"></span>Public computer centers</div><div><span class="chart-key cc-key"></span>Connected Communities locations</div></div>
+          <p>Search and resource filters apply; the center-group choice does not change these comparison totals. Counts are not adjusted for population.</p>
+        </section>
+        <details class="source-notes"><summary>About these data</summary><p>The public computer center points and reported services come from NYC Open Data’s 2024 Citywide Public Computer Centers file. The 2020 NTA boundaries come from the NYC Department of City Planning. The Connected Communities and Digital Investment District classifications come from project files supplied for this prototype. A center absent from the Connected Communities list is not necessarily unfunded. District categories are high and very high; no numeric need scores were supplied.</p><a href="https://data.cityofnewyork.us/Social-Services/Citywide-Public-Computer-Centers/sejx-2gn3" target="_blank" rel="noopener noreferrer">Public computer center data ↗</a><a href="https://data.cityofnewyork.us/d/9nt8-h7nd" target="_blank" rel="noopener noreferrer">2020 NTA source ↗</a></details>
+        <div class="control-block">
+          <label class="field-label" for="search">SEARCH CENTERS</label>
+          <div class="search-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.2"/><path d="m16 16 4.4 4.4"/></svg><input id="search" type="search" placeholder="Name, address, ZIP, or NTA" autocomplete="off"></div>
+        </div>
+        <div class="control-block"><label class="field-label" for="funding">SHOW LOCATIONS</label><select id="funding"><option value="">All mapped locations</option><option value="cc">Connected Communities locations</option><option value="other">Other public computer centers</option></select></div>
+        <div class="control-block"><label class="field-label" for="type">FACILITY TYPE</label><select id="type"><option value="">All types</option><option>Library</option><option>Older adult center</option><option>Parks &amp; recreation</option><option>Community center</option></select></div>
+        <fieldset class="control-block services"><legend class="field-label">RESOURCES, SERVICES &amp; ACCESS <span>· select any</span></legend>
+          <label><input type="checkbox" id="computers"><span class="check"></span><span>Public computers</span></label>
+          <label><input type="checkbox" id="wifi"><span class="check"></span><span>Wi-Fi ≥ 100 Mbps</span></label>
+          <label><input type="checkbox" id="literacy"><span class="check"></span><span>Digital literacy</span></label>
+          <label><input type="checkbox" id="staffed"><span class="check"></span><span>Staffed site</span></label>
+          <label><input type="checkbox" id="wheelchair"><span class="check"></span><span>Wheelchair accessible</span></label>
+        </fieldset>
+        <div class="layer-controls" role="group" aria-label="Map layers">
+          <div class="field-label">MAP LAYERS</div>
+          <label><input type="checkbox" id="district-toggle" checked><span class="switch"></span><span>Digital Investment Districts</span></label>
+          <label><input type="checkbox" id="funded-toggle" checked><span class="switch"></span><span>Highlight Connected Communities</span></label>
+          <label><input type="checkbox" id="nta-toggle"><span class="switch"></span><span>All 2020 NTA boundaries</span></label>
+          <button id="clear-filters" type="button">Reset filters</button>
+        </div>
+        <div id="nta-active" class="nta-active" hidden><span id="nta-active-label"></span><button id="clear-nta" type="button" aria-label="Clear neighborhood filter">×</button></div>
+        <div id="district-summary" class="district-summary" hidden></div>
+        <div id="coverage-summary" class="coverage-summary" aria-live="polite"></div>
+        <details class="supplementary-list" id="extra-panel" open><summary><span id="extra-summary">Connected Communities locations shown separately</span></summary><p>We could not confidently pair these locations with a public computer center in the 2024 list, so they appear as separate points without service details.</p><div id="extra-list"></div></details>
+        <details class="supplementary-list" id="unmapped-panel"><summary><span id="unmapped-summary">Additional sites</span></summary><p>These Connected Communities entries lack a verified match or map point. Their addresses are listed for review; they are excluded from district tallies.</p><div id="unmapped-list"></div></details>
+        <details class="supplementary-list" id="mobile-panel"><summary><span id="mobile-summary">Mobile service listings</span></summary><p>Mobile programs have no permanent map location and are not drawn as points.</p><div id="mobile-list"></div></details>
+        <div class="list-heading"><div><div class="section-label">PUBLIC COMPUTER CENTERS</div><h3><span id="list-count">534</span> locations</h3></div><select id="sort" aria-label="Sort center directory"><option value="name">Name A–Z</option><option value="workstations">Most computers</option><option value="wifi">Fastest Wi-Fi</option></select></div>
+        <div id="center-list" class="center-list" aria-live="polite"></div>
+      </div>
+    </aside>
+    <section class="map-shell" aria-label="Map of NYC public computer centers">
+      <div id="map" role="application" aria-label="Interactive map of public computer centers"></div>
+      <div class="map-display" role="group" aria-label="Map display">
+        <span class="field-label">MAP DISPLAY</span>
+        <div class="segmented mode-options">
+          <label><input type="radio" name="map-mode" value="centers" checked><span>Individual centers</span></label>
+          <label><input type="radio" name="map-mode" value="boroughs"><span>Borough totals</span></label>
+        </div>
+      </div>
+      <div class="map-legend"><div class="legend-title">MAP KEY</div><div><span class="legend-dot center-dot"></span> <span id="marker-legend">Public computer center</span></div><div><span class="legend-dot funded-dot"></span> Connected Communities: also in the 2024 public computer center list</div><div><span class="legend-diamond"></span> Connected Communities: not found in the 2024 public computer center list</div><div><span class="legend-swatch need-high"></span> High-need neighborhood</div><div><span class="legend-swatch need-very-high"></span> Very high-need neighborhood</div></div>
+      <div class="map-note" id="map-note"><strong>Research prototype · 106 Connected Communities locations</strong></div>
+    </section>
+  </main>
+  <section class="drawer" id="detail-drawer" aria-label="Center details" hidden><button class="drawer-close" id="detail-close" type="button" aria-label="Close details">×</button><div id="detail-content"></div></section>
+  <div id="scrim" class="scrim" hidden></div>
+  <noscript><div class="noscript">JavaScript is required to view the interactive map.</div></noscript>
+</body>
+</html>
